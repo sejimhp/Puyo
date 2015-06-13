@@ -2,13 +2,13 @@
 
 #include "Game.h"
 
-void Game::init(){
+Game::Game(){
 	TextureAsset::Register(L"block", L"item/block.png");
 	TextureAsset::Register(L"background", L"item/background.png");
 	TextureAsset::Register(L"stage", L"item/stage.png");
 	TextureAsset::Register(L"T", L"item/time.png");
-	state = State::TITLE;
 	font(30);
+	state = State::TITLE;
 }
 
 void Game::run(){
@@ -17,6 +17,8 @@ void Game::run(){
 		if (Input::KeyEnter.clicked)
 		{
 			state = State::GAME;
+			start_time = Time::GetMillisec();
+			start();
 		}
 		break;
 	case State::GAME:
@@ -24,6 +26,7 @@ void Game::run(){
 		{
 			state = State::PAUSE;
 		}
+		time = Time::GetMillisec() - start_time;
 		break;
 	case State::PAUSE:
 		if (Input::KeyEnter.clicked)
@@ -54,6 +57,7 @@ void Game::draw(){
 		Rect(450, 70, 70, 100).draw(Palette::Black);
 		Rect(330, 275, 185, 50).draw(Palette::Black);
 		TextureAsset(L"T").draw(345, 230);
+		font((time / 60000),L"•ª", ((time % 60000) / 1000), L"•b", ((time % 1000) / 100)).draw(350, 280);
 		break;
 	case State::PAUSE:
 		font(L"PAUSE").draw();
@@ -63,4 +67,8 @@ void Game::draw(){
 		break;
 	}
 
+}
+
+void Game::start(){
+	start_time = Time::GetMillisec();
 }

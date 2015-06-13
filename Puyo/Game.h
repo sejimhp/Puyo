@@ -14,8 +14,11 @@ class Game{
 	};
 	Font font;
 	State state;
+	unsigned int start_time, time;
 public:
-	void init();
+	Game();
 	void run();
 	void draw();
+	void start();
+	void finish();
 };
