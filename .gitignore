@@ -203,3 +203,10 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+
+
+#MySetting
+/Puyo/engine
+/Puyo/Example
+/Puyo/Screenshot
+*.html
