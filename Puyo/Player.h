@@ -3,6 +3,8 @@
 class Player{
 	//座標
 	int X, Y;
+	//落下用
+	int x, y;
 	//盤面のデータ
 	int stage[8][12];
 	//ぷよぷよ
@@ -11,6 +13,6 @@ class Player{
 public:
 	void init(int, int);
 	void run();
-	void set(int data[][2]);
+	void init(int data[][2]);
 	void draw();
 };

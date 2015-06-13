@@ -57,6 +57,8 @@ void Game::draw(){
 		break;
 	case State::GAME:
 		draw_stage();
+		player1.draw();
+		player2.draw();
 		break;
 	case State::PAUSE:
 		font(L"PAUSE").draw();
@@ -77,7 +79,8 @@ void Game::start(){
 		a = Random(1, 5);	
 		data[i][1] = a;
 	}
-	player1.set(data);
+	player1.init(data);
+	player2.init(data);
 	start_time = Time::GetMillisec();
 }
 
