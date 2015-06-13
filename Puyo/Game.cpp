@@ -1,14 +1,20 @@
 #include <Siv3D.hpp>
 
 #include "Game.h"
+#include "Player.h"
 
 Game::Game(){
 	TextureAsset::Register(L"block", L"item/block.png");
 	TextureAsset::Register(L"background", L"item/background.png");
 	TextureAsset::Register(L"stage", L"item/stage.png");
 	TextureAsset::Register(L"T", L"item/time.png");
+	TextureAsset::Register(L"puyo", L"item/puyo.png");
+	
 	font(30);
 	state = State::TITLE;
+	
+	player1.init(30, 70);
+	player2.init(530, 70);
 }
 
 void Game::run(){
@@ -17,7 +23,6 @@ void Game::run(){
 		if (Input::KeyEnter.clicked)
 		{
 			state = State::GAME;
-			start_time = Time::GetMillisec();
 			start();
 		}
 		break;
@@ -27,6 +32,8 @@ void Game::run(){
 			state = State::PAUSE;
 		}
 		time = Time::GetMillisec() - start_time;
+		player1.run();
+		player2.run();
 		break;
 	case State::PAUSE:
 		if (Input::KeyEnter.clicked)
@@ -49,15 +56,7 @@ void Game::draw(){
 		font(L"TITLE").draw();
 		break;
 	case State::GAME:
-		//TextureAsset(L"background").draw();
-		Rect(0, 0, 850, 550).draw(Palette::Gray);
-		TextureAsset(L"stage").map(SIZE * 8, SIZE * 12).draw(30, 70);
-		TextureAsset(L"stage").map(SIZE * 8, SIZE * 12).draw(530, 70);
-		Rect(328, 70, 70, 100).draw(Palette::Black);
-		Rect(450, 70, 70, 100).draw(Palette::Black);
-		Rect(330, 275, 185, 50).draw(Palette::Black);
-		TextureAsset(L"T").draw(345, 230);
-		font((time / 60000),L"•ª", ((time % 60000) / 1000), L"•b", ((time % 1000) / 100)).draw(350, 280);
+		draw_stage();
 		break;
 	case State::PAUSE:
 		font(L"PAUSE").draw();
@@ -70,5 +69,29 @@ void Game::draw(){
 }
 
 void Game::start(){
+	int a;
+	for (int i = 0; i < 100;i ++)
+	{
+		a = Random(1, 5);	
+		data[i][0] = a;
+		a = Random(1, 5);	
+		data[i][1] = a;
+	}
+	player1.set(data);
 	start_time = Time::GetMillisec();
+}
+
+void Game::draw_stage(){
+		//TextureAsset(L"background").draw();
+		Rect(0, 0, 850, 550).draw(Palette::Gray);
+		TextureAsset(L"stage").map(SIZE * 8, SIZE * 12).draw(30, 70);
+		TextureAsset(L"stage").map(SIZE * 8, SIZE * 12).draw(530, 70);
+		Rect(328, 70, 70, 100).draw(Palette::Black);
+		Rect(450, 70, 70, 100).draw(Palette::Black);
+		Rect(330, 275, 185, 50).draw(Palette::Black);
+		TextureAsset(L"T").draw(345, 230);
+		//timer
+		font((time / 60000),L"•ª", ((time % 60000) / 1000), L"•b", ((time % 1000) / 100)).draw(350, 280);
+		player1.draw();
+		player2.draw();
 }

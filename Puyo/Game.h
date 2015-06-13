@@ -1,5 +1,6 @@
 #pragma once;
 #include <Siv3D.hpp>
+#include "Player.h"
 
 #define SIZE 36
 #define STA1 80
@@ -15,10 +16,13 @@ class Game{
 	Font font;
 	State state;
 	unsigned int start_time, time;
+	int data[100][2];
+	Player player1, player2;
 public:
 	Game();
 	void run();
 	void draw();
 	void start();
 	void finish();
+	void draw_stage();
 };

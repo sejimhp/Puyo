@@ -9,5 +9,8 @@ class Player{
 	int count;
 	int puyo[100][2];
 public:
-
+	void init(int, int);
+	void run();
+	void set(int data[][2]);
+	void draw();
 };
