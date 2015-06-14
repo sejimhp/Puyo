@@ -89,8 +89,10 @@ void Game::draw_stage(){
 		Rect(0, 0, 850, 550).draw(Palette::Gray);
 		TextureAsset(L"stage").map(SIZE * 8, SIZE * 12).draw(30, 70);
 		TextureAsset(L"stage").map(SIZE * 8, SIZE * 12).draw(530, 70);
-		Rect(328, 70, 70, 100).draw(Palette::Black);
-		Rect(450, 70, 70, 100).draw(Palette::Black);
+		Rect(318, 70, 60, 90).draw(Palette::Black);
+		Rect(470, 70, 60, 90).draw(Palette::Black);
+		Rect(380, 70, 30, 50).draw(Palette::Black);
+		Rect(438, 70, 30, 50).draw(Palette::Black);
 		Rect(330, 275, 185, 50).draw(Palette::Black);
 		TextureAsset(L"T").draw(345, 230);
 		//timer
