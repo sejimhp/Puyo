@@ -79,8 +79,8 @@ void Game::start(){
 		a = Random(1, 5);	
 		data[i][1] = a;
 	}
-	player1.init(data);
-	player2.init(data);
+	player1.set(data);
+	player2.set(data);
 	start_time = Time::GetMillisec();
 }
 

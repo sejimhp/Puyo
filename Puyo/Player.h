@@ -1,18 +1,25 @@
 #pragma once
 
+#define PI 3.14159
+
 class Player{
-	//座標
+	//array
 	int X, Y;
-	//落下用
+	//falling
 	int x, y;
-	//盤面のデータ
+	//stage data
 	int stage[8][12];
-	//ぷよぷよ
+	//puyopuyo
 	int count;
 	int puyo[100][2];
+	//Rotaition
+	int rot, rot_flag;
 public:
 	void init(int, int);
 	void run();
-	void init(int data[][2]);
+	void action();
+	void input();
+	void puyo_event();
+	void set(int data[][2]);
 	void draw();
 };
