@@ -9,6 +9,7 @@
 class Game{
 	enum class State{
 		TITLE,
+		START,
 		GAME,
 		PAUSE,
 		END

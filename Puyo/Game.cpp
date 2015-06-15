@@ -22,8 +22,13 @@ void Game::run(){
 	case State::TITLE:
 		if (Input::KeyEnter.clicked)
 		{
-			state = State::GAME;
+			state = State::START;;
+		}
+		break;
+	case State::START:
+		if (player1.start() == 1 && player1.start() == 1){
 			start();
+			state = State::GAME;
 		}
 		break;
 	case State::GAME:
@@ -55,10 +60,11 @@ void Game::draw(){
 	case State::TITLE:
 		font(L"TITLE").draw();
 		break;
+	case State::START:
+		draw_stage();
+		break;
 	case State::GAME:
 		draw_stage();
-		player1.draw();
-		player2.draw();
 		break;
 	case State::PAUSE:
 		font(L"PAUSE").draw();
