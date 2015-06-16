@@ -19,6 +19,7 @@ class Game{
 	unsigned int start_time, time;
 	int data[100][2];
 	Player player1, player2;
+	int select;
 public:
 	Game();
 	void run();

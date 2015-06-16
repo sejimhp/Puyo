@@ -9,20 +9,37 @@ Game::Game(){
 	TextureAsset::Register(L"stage", L"item/stage.png");
 	TextureAsset::Register(L"T", L"item/time.png");
 	TextureAsset::Register(L"puyo", L"item/puyo.png");
+	TextureAsset::Register(L"2p", L"item/2p.png");
+	TextureAsset::Register(L"cpu1", L"item/cpu1.png");
+	TextureAsset::Register(L"cpu2", L"item/cpu2.png");
+	TextureAsset::Register(L"cpu3", L"item/cpu3.png");
+	TextureAsset::Register(L"title", L"item/title.png");
+	TextureAsset::Register(L"sankaku", L"item/sankaku.png");
 	
 	font(30);
 	state = State::TITLE;
 	
 	player1.init(30, 70);
 	player2.init(530, 70);
+
+	select = 0;
 }
 
 void Game::run(){
 	switch (state){
 	case State::TITLE:
-		if (Input::KeyEnter.clicked)
-		{
+		if (Input::KeyEnter.clicked){
 			state = State::START;;
+		}
+		if (Input::KeyUp.clicked){
+			if (select == 0)
+				select = 3;
+			else
+				select--;
+		}
+		if (Input::KeyDown.clicked){
+			select++;
+			select %= 4;
 		}
 		break;
 	case State::START:
@@ -58,7 +75,13 @@ void Game::run(){
 void Game::draw(){
 	switch (state){
 	case State::TITLE:
-		font(L"TITLE").draw();
+		TextureAsset(L"sankaku").draw(180, 260 + select * 70);
+		font(L"Å¶2pà»äOñ¢é¿ëï").draw(500, 250);
+		TextureAsset(L"title").draw(80, 50);
+		TextureAsset(L"2p").draw(220, 250);
+		TextureAsset(L"cpu1").draw(220, 320);
+		TextureAsset(L"cpu2").draw(220, 390);
+		TextureAsset(L"cpu3").draw(220, 460);
 		break;
 	case State::START:
 		draw_stage();
@@ -67,9 +90,11 @@ void Game::draw(){
 		draw_stage();
 		break;
 	case State::PAUSE:
+		draw_stage();
 		font(L"PAUSE").draw();
 		break;
 	case State::END:
+		draw_stage();
 		font(L"END").draw();
 		break;
 	}
