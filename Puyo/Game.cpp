@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "Player.h"
+#include "Player2.h"
 
 Game::Game(){
 	TextureAsset::Register(L"block", L"item/block.png");
@@ -15,6 +16,7 @@ Game::Game(){
 	TextureAsset::Register(L"cpu3", L"item/cpu3.png");
 	TextureAsset::Register(L"title", L"item/title.png");
 	TextureAsset::Register(L"sankaku", L"item/sankaku.png");
+	TextureAsset::Register(L"tech", L"item/tech.png");
 	
 	font(30);
 	state = State::TITLE;
@@ -43,7 +45,7 @@ void Game::run(){
 		}
 		break;
 	case State::START:
-		if (player1.start() == 1 && player1.start() == 1){
+		if (player1.start() == 1 && player2.start() == 1){
 			start();
 			state = State::GAME;
 		}

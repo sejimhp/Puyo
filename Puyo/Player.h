@@ -3,6 +3,7 @@
 #define PI 3.14159
 
 class Player{
+protected:
 	enum class State{
 		START,
 		GAME,

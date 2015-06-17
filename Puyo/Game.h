@@ -1,6 +1,7 @@
 #pragma once;
 #include <Siv3D.hpp>
 #include "Player.h"
+#include "Player2.h"
 
 #define SIZE 36
 #define STA1 80
@@ -18,7 +19,8 @@ class Game{
 	State state;
 	unsigned int start_time, time;
 	int data[100][2];
-	Player player1, player2;
+	Player player1;
+	Player2 player2;
 	int select;
 public:
 	Game();
