@@ -22,6 +22,7 @@ class Game{
 	Player player1;
 	Player2 player2;
 	int select;
+	int count_flag;
 public:
 	Game();
 	void run();
@@ -29,4 +30,5 @@ public:
 	void start();
 	void finish();
 	void draw_stage();
+	void countdown();
 };

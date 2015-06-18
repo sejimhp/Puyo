@@ -80,10 +80,15 @@ int Player2::start(){
 }
 
 void Player2::draw(){
+	static int time = 0;
 	switch (state){
 	case State::START:
-
-		break;
+		time++;
+		time %= 180;
+		if (ready == 1)
+			TextureAsset(L"ready").draw(X + 50, Y + 200);
+		else
+			TextureAsset(L"down").draw(X + 5, Y + 200, Alpha((int)(255 * (sin((double)time / 360 * 2 * PI)))));		break;
 	case State::END:
 		break;
 	case State::GAME:

@@ -188,9 +188,15 @@ void Player::puyo_event(){
 }
 
 void Player::draw(){
+	static int time = 0;
 	switch (state){
 	case State::START:
-
+		time++;
+		time %= 180;
+		if (ready == 1)
+			TextureAsset(L"ready").draw(X + 50, Y + 200);
+		else
+			TextureAsset(L"s").draw(X + 5, Y + 200, Alpha((int)(255 * (sin((double)time / 360 * 2 * PI)))));
 		break;
 	case State::END:
 		break;
@@ -251,7 +257,6 @@ void Player::draw(){
 			switch (puyo[count + 1][i]){
 			case 1:
 				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(330, 70 + i * SIZE + 10);
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(386, 70 + i * 18 + 6);
 				break;
 			case 2:
 				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(330, 70 + i * SIZE + 10);
