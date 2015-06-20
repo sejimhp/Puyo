@@ -3,7 +3,7 @@
 #include "Game.h"
 #include <Siv3D.hpp>
 
-void Player2::run(){
+int Player2::run(){
 	//アニメーションなどのイベントはすべてpuyo_eventで・・・。
 
 	switch (state){
@@ -12,16 +12,14 @@ void Player2::run(){
 	case State::GAME:
 		input();
 		fall();
+		if (stage[2][0] != 0)
+			return 1;
 		break;
 	case State::EVENT:
 		puyo_event();
 		break;
-	case State::PAUSE:
-		break;
-	case State::END:
-		ending();
-		break;
 	};
+	return 0;
 }
 
 
@@ -55,16 +53,12 @@ void Player2::input(){
 			//Left
 			x -= SIZE;
 		}
-		if (Input::KeyRight.clicked && x < 7 * SIZE && (stage[x / SIZE + 1][y / SIZE + 2] == 0 && stage[x / SIZE + 1][y / SIZE + 1] == 0)){
+		if (Input::KeyRight.clicked && x < (WID - 1) * SIZE && (stage[x / SIZE + 1][y / SIZE + 2] == 0 && stage[x / SIZE + 1][y / SIZE + 1] == 0)){
 			//Right
 			x += SIZE;
 		}
 		break;
 	case State::EVENT:
-		break;
-	case State::PAUSE:
-		break;
-	case State::END:
 		break;
 	};
 }
@@ -88,11 +82,9 @@ void Player2::draw(){
 			TextureAsset(L"ready").draw(X + 10, Y + 200);
 		else
 			TextureAsset(L"down").scale(0.75).draw(X + 5, Y + 200, Alpha((int)(255 * (sin((double)time / 360 * 2 * PI)))));
-	case State::END:
-		break;
 	case State::GAME:
 	case State::EVENT:
-	case State::PAUSE:
+		TextureAsset(L"batu").draw(X + 2 * SIZE, Y);
 		//Red Blue Yellow Green Purple
 		//putting puyo
 		for (int i = 0; i < WID; i++){

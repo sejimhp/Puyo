@@ -8,8 +8,7 @@ protected:
 		START,
 		GAME,
 		EVENT,
-		PAUSE,
-		END
+		DESTROY
 	} state;
 	//array
 	int X, Y;
@@ -18,7 +17,7 @@ protected:
 	//stage data
 	int stage[6][12];
 	//break
-	int destroy[6][12], sum, destroy_flag;
+	int destroy[6][12], destroy_flag;
 	//puyopuyo
 	int count;
 	int puyo[100][2];
@@ -30,12 +29,14 @@ protected:
 public:
 	void init(int, int);
 
-	void run();
+	int run();
 
 	void fall();
 	int put();
 	void input();
 	void break_puyo();
+	int search(int, int, int);
+	void sub(int, int, int);
 	void puyo_event();
 	int start();
 	void ending();

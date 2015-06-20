@@ -11,24 +11,26 @@ void Player::init(int X, int Y){
 	rot_flag = 0;
 }
 
-void Player::run(){
+int Player::run(){
 	switch (state){
 	case State::START:
 		break;
 	case State::GAME:
+		break_puyo();
 		input();
 		fall();
-		break_puyo();
+		if (stage[2][0] != 0){
+			return 1;
+		}
 		break;
 	case State::EVENT:
 		puyo_event();
 		break;
-	case State::PAUSE:
-		break;
-	case State::END:
-		ending();
+	case State::DESTROY:
+		puyo_event;
 		break;
 	};
+	return 0;
 }
 
 void Player::input(){
@@ -138,10 +140,64 @@ void Player::fall(){
 		y++;
 }
 
-void Player::break_puyo(){
-	for (int i = 0; i < WID; i++){
-		for (int j = 0; j < HEG; j++){
+int Player::search(int i, int j, int state){
+	int sum = 1;
 
+	if (stage[i][j] == stage[i][j - 1] && j != 0 && state != 2){
+		sum += search(i, j - 1, 1);
+	}
+	if (stage[i][j] == stage[i][j + 1] && j != (HEG - 1) && state != 1){
+		sum += search(i, j + 1, 2);
+	}
+	if (stage[i][j] == stage[i - 1][j] && i != 0 && state != 4){
+		sum += search(i - 1, j, 3);
+	}
+	if (stage[i][j] == stage[i + 1][j] && i != (WID - 1) && state != 3){
+		sum += search(i + 1, j, 4);
+	}
+	return sum;
+}
+
+void Player::sub(int i, int j, int state){
+	destroy[i][j] = 1;
+
+	if (stage[i][j] == stage[i][j - 1] && j != 0 && state != 2){
+		sub(i, j - 1, 1);
+	}
+	if (stage[i][j] == stage[i][j + 1] && j != (HEG - 1) && state != 1){
+		sub(i, j + 1, 2);
+	}
+	if (stage[i][j] == stage[i - 1][j] && i != 0 && state != 4){
+		sub(i - 1, j, 3);
+	}
+	if (stage[i][j] == stage[i + 1][j] && i != (WID - 1) && state != 3){
+		sub(i + 1, j, 4);
+	}
+	//exti disturbance
+	if (stage[i][j - 1] == 6){
+		destroy[i][j - 1] = 1;
+	}
+	if (stage[i][j + 1] == 6){
+		destroy[i][j + 1] = 1;
+	}
+	if (stage[i + 1][j] == 6){
+		destroy[i + 1][j] = 1;
+	}
+	if (stage[i - 1][j] == 6){
+		destroy[i - 1][j] = 1;
+	}
+}
+
+void Player::break_puyo(){
+	int val = 0;
+	for (int i = WID - 1; i >= 0; i--){
+		for (int j = HEG - 1; j >= 0; j--){
+			if (stage[i][j] != 0)
+				val = search(i, j, 0);
+			if (val >= 4){
+				sub(i, j, 0);
+				state = State::DESTROY;
+			}
 		}
 	}
 }
@@ -196,11 +252,9 @@ void Player::draw(){
 		else
 			TextureAsset(L"s").scale(0.75).draw(X + 5, Y + 200, Alpha((int)(255 * (sin((double)time / 360 * 2 * PI)))));
 		break;
-	case State::END:
-		break;
 	case State::GAME:
 	case State::EVENT:
-	case State::PAUSE:
+		TextureAsset(L"batu").draw(X + 2 * SIZE, Y);
 		//Red Blue Yellow Green Purple
 		//putting puyo
 		for (int i = 0; i < WID; i++){
@@ -303,6 +357,7 @@ void Player::set(int data[][2]){
 	}
 	x = 2 * SIZE;
 	state = State::GAME;
+	count = 0;
 }
 
 int Player::start(){
@@ -315,4 +370,8 @@ int Player::start(){
 }
 
 void Player::ending(){
+	if (stage[2][0] == 0)
+		TextureAsset(L"winner").draw(X - 10, 250);
+	else
+		TextureAsset(L"loser").draw(X + 10, 250);
 }

@@ -3,7 +3,7 @@
 
 class Player2 : public Player{
 public:
-	void run();
+	int run();
 	void input();
 	int start();
 	void draw();

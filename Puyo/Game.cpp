@@ -22,6 +22,9 @@ Game::Game(){
 	TextureAsset::Register(L"down", L"item/down.png");
 	TextureAsset::Register(L"game_start", L"item/game_start.png");
 	TextureAsset::Register(L"pause", L"item/pause.png");
+	TextureAsset::Register(L"batu", L"item/batu.png");
+	TextureAsset::Register(L"winner", L"item/winner.png");
+	TextureAsset::Register(L"loser", L"item/loser.png");
 
 	font(30);
 	state = State::TITLE;
@@ -62,8 +65,10 @@ void Game::run(){
 			state = State::PAUSE;
 			timer.pause();
 		}
-		player1.run();
-		player2.run();
+		if (player1.run() == 1 || player2.run() == 1){
+			state = State::END;
+			timer.pause();
+		}
 		break;
 	case State::PAUSE:
 		if (Input::KeyP.clicked)
@@ -110,6 +115,8 @@ void Game::draw(){
 	case State::END:
 		draw_stage();
 		font(L"END").draw();
+		player1.ending();
+		player2.ending();
 		break;
 	}
 
@@ -117,11 +124,16 @@ void Game::draw(){
 
 void Game::start(){
 	int a;
+	int rand = Random(1, 5);
 	for (int i = 0; i < 100; i++)
 	{
-		a = Random(1, 5);
+		do{
+			a = Random(1, 5);
+		} while (a == rand);
 		data[i][0] = a;
-		a = Random(1, 5);
+		do{
+			a = Random(1, 5);
+		} while (a == rand);
 		data[i][1] = a;
 	}
 	player1.set(data);
