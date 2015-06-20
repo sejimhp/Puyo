@@ -47,15 +47,15 @@ void Player2::input(){
 			else
 				rot_flag = 1;
 		}
-		else if (Input::KeyDown.pressed){
+		if (Input::KeyDown.pressed){
 			//speedy
-			y += 2;
+			y += 10;
 		}
-		else if (Input::KeyLeft.clicked && x > 0 && (stage[x / SIZE - 1][y / SIZE + 2] == 0 && stage[x / SIZE - 1][y / SIZE + 1] == 0)){
+		if (Input::KeyLeft.clicked && x > 0 && (stage[x / SIZE - 1][y / SIZE + 2] == 0 && stage[x / SIZE - 1][y / SIZE + 1] == 0)){
 			//Left
 			x -= SIZE;
 		}
-		else if (Input::KeyRight.clicked && x < 7 * SIZE && (stage[x / SIZE + 1][y / SIZE + 2] == 0 && stage[x / SIZE + 1][y / SIZE + 1] == 0)){
+		if (Input::KeyRight.clicked && x < 7 * SIZE && (stage[x / SIZE + 1][y / SIZE + 2] == 0 && stage[x / SIZE + 1][y / SIZE + 1] == 0)){
 			//Right
 			x += SIZE;
 		}
@@ -67,7 +67,6 @@ void Player2::input(){
 	case State::END:
 		break;
 	};
-
 }
 
 int Player2::start(){
@@ -86,9 +85,9 @@ void Player2::draw(){
 		time++;
 		time %= 180;
 		if (ready == 1)
-			TextureAsset(L"ready").draw(X + 50, Y + 200);
+			TextureAsset(L"ready").draw(X + 10, Y + 200);
 		else
-			TextureAsset(L"down").draw(X + 5, Y + 200, Alpha((int)(255 * (sin((double)time / 360 * 2 * PI)))));		break;
+			TextureAsset(L"down").scale(0.75).draw(X + 5, Y + 200, Alpha((int)(255 * (sin((double)time / 360 * 2 * PI)))));
 	case State::END:
 		break;
 	case State::GAME:
@@ -96,8 +95,8 @@ void Player2::draw(){
 	case State::PAUSE:
 		//Red Blue Yellow Green Purple
 		//putting puyo
-		for (int i = 0; i < 8; i++){
-			for (int j = 0; j < 12; j++){
+		for (int i = 0; i < WID; i++){
+			for (int j = 0; j < HEG; j++){
 				switch (stage[i][j]){
 				case 1:
 					TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE);
@@ -147,37 +146,36 @@ void Player2::draw(){
 		for (int i = 0; i < 2; i++){
 			switch (puyo[count + 1][i]){
 			case 1:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(481, 70 + i * SIZE + 10);
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(444, 70 + i * 18 + 6);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(409, 70 + i * SIZE + 10);
 				break;
 			case 2:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(481, 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(409, 70 + i * SIZE + 10);
 				break;
 			case 3:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(481, 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(409, 70 + i * SIZE + 10);
 				break;
 			case 4:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(481, 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(409, 70 + i * SIZE + 10);
 				break;
 			case 5:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(481, 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(409, 70 + i * SIZE + 10);
 				break;
 			}
 			switch (puyo[count + 2][i]){
 			case 1:
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(444, 70 + i * 18 + 6);
+				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).draw(382, 130 + i * 24 + 12);
 				break;
 			case 2:
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(444, 70 + i * 18 + 6);
+				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).draw(382, 130 + i * 24 + 12);
 				break;
 			case 3:
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(444, 70 + i * 18 + 6);
+				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).draw(382, 130 + i * 24 + 12);
 				break;
 			case 4:
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(444, 70 + i * 18 + 6);
+				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).draw(382, 130 + i * 24 + 12);
 				break;
 			case 5:
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(444, 70 + i * 18 + 6);
+				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).draw(382, 130 + i * 24 + 12);
 				break;
 			}
 		}

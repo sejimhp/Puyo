@@ -21,12 +21,13 @@ Game::Game(){
 	TextureAsset::Register(L"s", L"item/s.png");
 	TextureAsset::Register(L"down", L"item/down.png");
 	TextureAsset::Register(L"game_start", L"item/game_start.png");
+	TextureAsset::Register(L"pause", L"item/pause.png");
 
 	font(30);
 	state = State::TITLE;
 
 	player1.init(30, 70);
-	player2.init(530, 70);
+	player2.init(460, 70);
 
 	select = 0;
 	count_flag = 0;
@@ -35,9 +36,8 @@ Game::Game(){
 void Game::run(){
 	switch (state){
 	case State::TITLE:
-		if (Input::KeyEnter.clicked && select == 0){
+		if (Input::KeyEnter.clicked && select == 0)
 			state = State::START;
-		}
 		if (Input::KeyUp.clicked){
 			if (select == 0)
 				select = 3;
@@ -57,24 +57,26 @@ void Game::run(){
 		}
 		break;
 	case State::GAME:
-		if (Input::KeyEnter.clicked)
+		if (Input::KeyP.clicked)
 		{
 			state = State::PAUSE;
+			timer.pause();
 		}
-		time = Time::GetMillisec() - start_time;
 		player1.run();
 		player2.run();
 		break;
 	case State::PAUSE:
-		if (Input::KeyEnter.clicked)
+		if (Input::KeyP.clicked)
 		{
-			state = State::END;
+			state = State::GAME;
+			timer.start();
 		}
 		break;
 	case State::END:
 		if (Input::KeyEnter.clicked)
 		{
 			state = State::TITLE;
+			timer.reset();
 		}
 		break;
 	}
@@ -83,13 +85,13 @@ void Game::run(){
 void Game::draw(){
 	switch (state){
 	case State::TITLE:
-		TextureAsset(L"sankaku").draw(180, 260 + select * 70);
+		TextureAsset(L"sankaku").draw(140, 260 + select * 70);
 		font(L"¦2pˆÈŠO–¢ŽÀ‘•").draw(500, 250);
-		TextureAsset(L"title").draw(80, 50);
-		TextureAsset(L"2p").draw(220, 250);
-		TextureAsset(L"cpu1").draw(220, 320);
-		TextureAsset(L"cpu2").draw(220, 390);
-		TextureAsset(L"cpu3").draw(220, 460);
+		TextureAsset(L"title").draw(20, 50);
+		TextureAsset(L"2p").draw(180, 250);
+		TextureAsset(L"cpu1").draw(180, 320);
+		TextureAsset(L"cpu2").draw(180, 390);
+		TextureAsset(L"cpu3").draw(180, 460);
 		break;
 	case State::START:
 		draw_stage();
@@ -103,7 +105,7 @@ void Game::draw(){
 		break;
 	case State::PAUSE:
 		draw_stage();
-		font(L"PAUSE").draw();
+		TextureAsset(L"pause").draw(400, 160);
 		break;
 	case State::END:
 		draw_stage();
@@ -124,22 +126,22 @@ void Game::start(){
 	}
 	player1.set(data);
 	player2.set(data);
-	start_time = Time::GetMillisec();
+	timer.start();
 }
 
 void Game::draw_stage(){
 	//TextureAsset(L"background").draw();
 	Rect(0, 0, 850, 550).draw(Palette::Gray);
-	TextureAsset(L"stage").map(SIZE * 8, SIZE * 12).draw(30, 70);
-	TextureAsset(L"stage").map(SIZE * 8, SIZE * 12).draw(530, 70);
-	Rect(318, 70, 60, 90).draw(Palette::Black);
-	Rect(470, 70, 60, 90).draw(Palette::Black);
-	Rect(380, 70, 30, 50).draw(Palette::Black);
-	Rect(438, 70, 30, 50).draw(Palette::Black);
-	Rect(330, 275, 185, 50).draw(Palette::Black);
-	TextureAsset(L"T").draw(345, 230);
+	TextureAsset(L"stage").map(SIZE * WID, SIZE * HEG).draw(30, 70);
+	TextureAsset(L"stage").map(SIZE * WID, SIZE * HEG).draw(460, 70);
+	Rect(246, 70, 60, 90).draw(Palette::Black);
+	Rect(400, 70, 60, 90).draw(Palette::Black);
+	Rect(246 + 40, 130, 50, 70).draw(Palette::Black);
+	Rect(400 - 30, 130, 50, 70).draw(Palette::Black);
+	Rect(260, 275, 185, 50).draw(Palette::Black);
+	TextureAsset(L"T").draw(273, 230);
 	//timer
-	font((time / 60000), L"•ª", ((time % 60000) / 1000), L"•b", ((time % 1000) / 100)).draw(350, 280);
+	font((timer.elapsed() / 60000), L"•ª", ((timer.elapsed() % 60000) / 1000), L"•b", ((timer.elapsed() % 1000) / 100)).draw(278, 280);
 	player1.draw();
 	player2.draw();
 }
@@ -151,9 +153,9 @@ void Game::countdown(){
 	if ((time1 - time) > 4000)	{ count_flag = 1; return; }
 	else {
 		if ((time1 - time) > 3000)
-			TextureAsset(L"game_start")(120, 0, 140, 40).draw(350, 400);
+			TextureAsset(L"game_start")(120, 0, 140, 40).draw(280, 400);
 		else
-			TextureAsset(L"game_start")((int)(time1 - time) / 1000 * 50, 0, 40, 40).draw(400, 400);
+			TextureAsset(L"game_start")((int)(time1 - time) / 1000 * 50, 0, 40, 40).draw(330, 400);
 	}
 	count_flag = 0;
 }

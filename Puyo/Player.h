@@ -16,7 +16,9 @@ protected:
 	//falling
 	int x, y;
 	//stage data
-	int stage[8][12];
+	int stage[6][12];
+	//break
+	int destroy[6][12], sum, destroy_flag;
 	//puyopuyo
 	int count;
 	int puyo[100][2];
@@ -33,10 +35,10 @@ public:
 	void fall();
 	int put();
 	void input();
+	void break_puyo();
 	void puyo_event();
 	int start();
 	void ending();
-	void pause();
 
 	void set(int data[][2]);
 	void draw();

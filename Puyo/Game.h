@@ -3,6 +3,8 @@
 #include "Player.h"
 #include "Player2.h"
 
+#define WID 6
+#define HEG 12
 #define SIZE 36
 #define STA1 80
 #define STA2 (80 + 13 * SIZE)
@@ -17,7 +19,7 @@ class Game{
 	};
 	Font font;
 	State state;
-	unsigned int start_time, time;
+	TimerMillisec timer;
 	int data[100][2];
 	Player player1;
 	Player2 player2;

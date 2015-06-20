@@ -5,7 +5,7 @@
 void Main()
 {
 	Window::SetTitle(L"PuyoGame");
-	Window::Resize(850, 550);
+	Window::Resize(730, 550);
 
 	Game game;
 	while (System::Update())

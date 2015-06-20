@@ -12,14 +12,13 @@ void Player::init(int X, int Y){
 }
 
 void Player::run(){
-	//アニメーションなどのイベントはすべてpuyo_eventで・・・。
-
 	switch (state){
 	case State::START:
 		break;
 	case State::GAME:
 		input();
 		fall();
+		break_puyo();
 		break;
 	case State::EVENT:
 		puyo_event();
@@ -30,57 +29,42 @@ void Player::run(){
 		ending();
 		break;
 	};
-	/*if (puyo_event()){
-		input();
-
-		//fall action etc..
-		fall();
-		}*/
 }
 
 void Player::input(){
-	switch (state){
-	case State::START:
-		break;
-	case State::GAME:
-		if (Input::KeyW.clicked && rot_flag == 0){
-			//Rotaition
-			if (rot == 270){
-				if (x == 0 && (stage[x / SIZE][y / SIZE] != 0 || stage[x / SIZE][y / SIZE + 1] != 0)){}
-				else if (stage[x / SIZE - 1][y / SIZE] != 0 || stage[x / SIZE + 1][y / SIZE] != 0){}
-				else
-					rot_flag = 1;
-			}
-			else if (rot == 90){
-				if (x == 0 && (stage[x / SIZE][y / SIZE] != 0 || stage[x / SIZE][y / SIZE - 1] != 0)){}
-				else if (stage[x / SIZE - 1][y / SIZE + 1] != 0 || stage[x / SIZE + 1][y / SIZE + 1] != 0){}
-				else
-					rot_flag = 1;
-			}
+	if (Input::KeyW.clicked && rot_flag == 0){
+		//Rotaition
+		if (rot == 270){
+			if (x == 0 && (stage[x / SIZE][y / SIZE] != 0 || stage[x / SIZE][y / SIZE + 1] != 0)){}
+			else if (stage[x / SIZE - 1][y / SIZE] != 0 || stage[x / SIZE + 1][y / SIZE] != 0){}
 			else
 				rot_flag = 1;
 		}
-		else if (Input::KeyS.pressed){
-			//speedy
-			y += 2;
+		else if (rot == 90){
+			if (x == 0 && (stage[x / SIZE][y / SIZE] != 0 || stage[x / SIZE][y / SIZE - 1] != 0)){}
+			else if (stage[x / SIZE - 1][y / SIZE + 1] != 0 || stage[x / SIZE + 1][y / SIZE + 1] != 0){}
+			else
+				rot_flag = 1;
 		}
-		else if (Input::KeyA.clicked && x > 0 && (stage[x / SIZE - 1][y / SIZE + 2] == 0 && stage[x / SIZE - 1][y / SIZE + 1] == 0)){
-			//Left
-			x -= SIZE;
-		}
-		else if (Input::KeyD.clicked && x < 7 * SIZE && (stage[x / SIZE + 1][y / SIZE + 2] == 0 && stage[x / SIZE + 1][y / SIZE + 1] == 0)){
-			//Right
-			x += SIZE;
-		}
-		break;
-	case State::EVENT:
-		break;
-	case State::PAUSE:
-		break;
-	case State::END:
-		break;
-	};
+		else
+			rot_flag = 1;
+	}
+	if (Input::KeyS.pressed){
+		//speedy
+		y += 10;
+	}
+	if (Input::KeyA.clicked && x > 0 && (stage[x / SIZE - 1][y / SIZE + 2] == 0 && stage[x / SIZE - 1][y / SIZE + 1] == 0)){
+		//Left
+		x -= SIZE;
+	}
+	if (Input::KeyD.clicked && x < (WID - 1) * SIZE && (stage[x / SIZE + 1][y / SIZE + 2] == 0 && stage[x / SIZE + 1][y / SIZE + 1] == 0)){
+		//Right
+		x += SIZE;
+	}
 
+	for (int i = 0; i < WID; i++)
+		for (int j = 0; j < HEG; j++)
+			destroy[i][j] = 0;
 }
 
 void Player::fall(){
@@ -88,9 +72,9 @@ void Player::fall(){
 	if (rot_flag == 1){
 		if (x == 0 && rot == 90)
 			x += 36;
-		else if (x == 7 * SIZE && rot == 270)
+		else if (x == (WID - 1) * SIZE && rot == 270)
 			x -= 36;
-		rot += 5;
+		rot += 10;
 		if (rot % 90 == 0){
 			rot_flag = 0;
 			rot %= 360;
@@ -102,12 +86,14 @@ void Player::fall(){
 		stage[x / SIZE][y / SIZE] = puyo[count][0];
 		stage[x / SIZE][y / SIZE + 1] = puyo[count][1];
 		put_flag = 1;
+		break_puyo();
 	}
 	else if ((y >= 11 * SIZE || stage[x / SIZE][y / SIZE + 1] != 0) && rot == 90){
 		//up
 		stage[x / SIZE][y / SIZE] = puyo[count][0];
 		stage[x / SIZE][y / SIZE - 1] = puyo[count][1];
 		put_flag = 1;
+		break_puyo();
 	}
 	else if ((y >= 11 * SIZE || stage[x / SIZE][y / SIZE + 1] != 0 || stage[x / SIZE - 1][y / SIZE + 1] != 0) && rot == 180){
 		//left
@@ -152,11 +138,20 @@ void Player::fall(){
 		y++;
 }
 
+void Player::break_puyo(){
+	for (int i = 0; i < WID; i++){
+		for (int j = 0; j < HEG; j++){
+
+		}
+	}
+}
+
 int Player::put(){
 	if (put_flag == 2){
 		y += 3;
 		if (stage[x / SIZE][y / SIZE + 1] != 0 || y >= 11 * SIZE){
 			stage[x / SIZE][y / SIZE] = puyo[count][0];
+			break_puyo();
 			return 1;
 		}
 		return 0;
@@ -166,13 +161,16 @@ int Player::put(){
 		if (rot == 0 && (stage[x / SIZE + 1][y / SIZE + 1] != 0 || y > 11 * SIZE)){
 			stage[x / SIZE + 1][y / SIZE] = puyo[count][1];
 			return 1;
+			break_puyo();
 		}
 		else if (rot == 180 && (stage[x / SIZE - 1][y / SIZE + 1] != 0 || y > 11 * SIZE)){
 			stage[x / SIZE - 1][y / SIZE] = puyo[count][1];
 			return 1;
+			break_puyo();
 		}
 		return 0;
 	}
+	break_puyo();
 	return 1;
 }
 
@@ -181,7 +179,7 @@ void Player::puyo_event(){
 		put_flag = 0;
 		count++;
 		y = 0;
-		x = 3 * SIZE;
+		x = 2 * SIZE;
 		rot = 270;
 		state = State::GAME;
 	}
@@ -194,9 +192,9 @@ void Player::draw(){
 		time++;
 		time %= 180;
 		if (ready == 1)
-			TextureAsset(L"ready").draw(X + 50, Y + 200);
+			TextureAsset(L"ready").draw(X + 10, Y + 200);
 		else
-			TextureAsset(L"s").draw(X + 5, Y + 200, Alpha((int)(255 * (sin((double)time / 360 * 2 * PI)))));
+			TextureAsset(L"s").scale(0.75).draw(X + 5, Y + 200, Alpha((int)(255 * (sin((double)time / 360 * 2 * PI)))));
 		break;
 	case State::END:
 		break;
@@ -205,8 +203,8 @@ void Player::draw(){
 	case State::PAUSE:
 		//Red Blue Yellow Green Purple
 		//putting puyo
-		for (int i = 0; i < 8; i++){
-			for (int j = 0; j < 12; j++){
+		for (int i = 0; i < WID; i++){
+			for (int j = 0; j < HEG; j++){
 				switch (stage[i][j]){
 				case 1:
 					TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE);
@@ -256,36 +254,36 @@ void Player::draw(){
 		for (int i = 0; i < 2; i++){
 			switch (puyo[count + 1][i]){
 			case 1:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(330, 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38 , 70 + i * SIZE + 10);
 				break;
 			case 2:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(330, 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38 , 70 + i * SIZE + 10);
 				break;
 			case 3:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(330, 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38 , 70 + i * SIZE + 10);
 				break;
 			case 4:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(330, 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38 , 70 + i * SIZE + 10);
 				break;
 			case 5:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(330, 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38 , 70 + i * SIZE + 10);
 				break;
 			}
 			switch (puyo[count + 2][i]){
 			case 1:
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(386, 70 + i * 18 + 6);
+				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).draw(WID * SIZE + 85, 130 + i * 24 + 12);
 				break;
 			case 2:
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(386, 70 + i * 18 + 6);
+				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).draw(WID * SIZE + 85, 130 + i * 24 + 12);
 				break;
 			case 3:
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(386, 70 + i * 18 + 6);
+				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).draw(WID * SIZE + 85, 130 + i * 24 + 12);
 				break;
 			case 4:
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(386, 70 + i * 18 + 6);
+				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).draw(WID * SIZE + 85, 130 + i * 24 + 12);
 				break;
 			case 5:
-				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).scale(0.75).draw(386, 70 + i * 18 + 6);
+				TextureAsset(L"puyo")((puyo[count + 2][i] - 1) * 24, 0, 24, 24).draw(WID * SIZE + 85, 130 + i * 24 + 12);
 				break;
 			}
 		}
@@ -298,12 +296,12 @@ void Player::set(int data[][2]){
 		puyo[i][0] = data[i][0];
 		puyo[i][1] = data[i][1];
 	}
-	for (int i = 0; i < 8; i++){
-		for (int j = 0; j < 12; j++){
+	for (int i = 0; i < WID; i++){
+		for (int j = 0; j < HEG; j++){
 			stage[i][j] = 0;
 		}
 	}
-	x = 3 * SIZE;
+	x = 2 * SIZE;
 	state = State::GAME;
 }
 
@@ -317,7 +315,4 @@ int Player::start(){
 }
 
 void Player::ending(){
-}
-
-void Player::pause(){
 }
