@@ -1,4 +1,5 @@
 #pragma once
+#include <Siv3D.hpp>
 
 #define PI 3.14159
 
@@ -17,7 +18,7 @@ protected:
 	//stage data
 	int stage[6][12];
 	//break
-	int destroy[6][12], destroy_flag;
+	int destroy[6][12], time;
 	//puyopuyo
 	int count;
 	int puyo[100][2];
