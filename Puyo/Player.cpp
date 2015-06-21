@@ -7,7 +7,6 @@ void Player::init(int X, int Y){
 	this->Y = Y;
 	count = 0;
 	rot = 270;
-	put_flag = 0;
 	rot_flag = 0;
 	time = 0;
 }
@@ -54,14 +53,20 @@ void Player::input(){
 	}
 	if (Input::KeyS.pressed){
 		//speedy
-		y += 10;
+		ay++;
+		y += 7 + ay;
+	}
+	if (Input::KeyS.released){
+		ay = 0;
 	}
 	if (Input::KeyA.clicked && x > 0 && (stage[x / SIZE - 1][y / SIZE + 2] == 0 && stage[x / SIZE - 1][y / SIZE + 1] == 0)){
 		//Left
+		if (!(rot == 180 && x == SIZE))
 		x -= SIZE;
 	}
 	if (Input::KeyD.clicked && x < (WID - 1) * SIZE && (stage[x / SIZE + 1][y / SIZE + 2] == 0 && stage[x / SIZE + 1][y / SIZE + 1] == 0)){
 		//Right
+		if (!(rot == 0 && x < (WID - 1) * SIZE))
 		x += SIZE;
 	}
 
@@ -74,6 +79,8 @@ void Player::fall(){
 			x += 36;
 		else if (x == (WID - 1) * SIZE && rot == 270)
 			x -= 36;
+		else if ((HEG * SIZE - y) < 36 && rot == 180)
+			y -= 36;
 		rot += 10;
 		if (rot % 90 == 0){
 			rot_flag = 0;
@@ -81,77 +88,70 @@ void Player::fall(){
 		}
 	}
 	//put puyo
-	if ((y >= 10 * SIZE || stage[x / SIZE][y / SIZE + 2] != 0) && rot == 270){
+	if ((y >= 10 * SIZE || stage[x / SIZE][y / SIZE + 2] != 0) && rot == 270 && y >= 0){
 		//down
-		stage[x / SIZE][y / SIZE] = puyo[count][0];
-		stage[x / SIZE][y / SIZE + 1] = puyo[count][1];
-		put_flag = 1;
-		break_puyo();
-	}
-	else if ((y >= 11 * SIZE || stage[x / SIZE][y / SIZE + 1] != 0) && rot == 90){
-		//up
-		stage[x / SIZE][y / SIZE] = puyo[count][0];
-		stage[x / SIZE][y / SIZE - 1] = puyo[count][1];
-		put_flag = 1;
-		break_puyo();
-	}
-	else if ((y >= 11 * SIZE || stage[x / SIZE][y / SIZE + 1] != 0 || stage[x / SIZE - 1][y / SIZE + 1] != 0) && rot == 180){
-		//left
-		if (stage[x / SIZE][y / SIZE + 1] == 0){
-			//under main puyo
-			stage[x / SIZE][y / SIZE] = puyo[count][0];
-			stage[x / SIZE - 1][y / SIZE] = puyo[count][1];
+		if (stage[x / SIZE][y / SIZE + 1] != 0){
+			stage[x / SIZE][y / SIZE - 1] = puyo[count][0];
+			stage[x / SIZE][y / SIZE] = puyo[count][1];
 		}
-		else if (stage[x / SIZE - 1][y / SIZE + 1] == 0){
-			//under another puyo
+		else{
 			stage[x / SIZE][y / SIZE] = puyo[count][0];
-			stage[x / SIZE + 1][y / SIZE] = puyo[count][1];
+			stage[x / SIZE][y / SIZE + 1] = puyo[count][1];
 		}
-		else {
-			stage[x / SIZE][y / SIZE] = puyo[count][0];
-			stage[x / SIZE - 1][y / SIZE] = puyo[count][1];
-		}
-		put_flag = 1;
-	}
-	else if ((y >= 11 * SIZE || stage[x / SIZE][y / SIZE + 1] != 0 || stage[x / SIZE + 1][y / SIZE + 1] != 0) && rot == 0){
-		//right
-		if (stage[x / SIZE][y / SIZE + 1] == 0){
-			//under main puyo
-			stage[x / SIZE][y / SIZE] = puyo[count][0];
-			stage[x / SIZE + 1][y / SIZE] = puyo[count][1];
-		}
-		else if (stage[x / SIZE + 1][y / SIZE + 1] == 0){
-			//under another puyo
-			stage[x / SIZE][y / SIZE] = puyo[count][0];
-			stage[x / SIZE + 1][y / SIZE] = puyo[count][1];
-		}
-		else {
-			stage[x / SIZE][y / SIZE] = puyo[count][0];
-			stage[x / SIZE + 1][y / SIZE] = puyo[count][1];
-		}
-		put_flag = 1;
-	}
-
-	break_puyo();
-	if (put_flag != 0)
 		state = State::EVENT;
+		fall_flag = 0;
+	}
+	else if ((y >= 11 * SIZE || stage[x / SIZE][y / SIZE + 1] != 0) && rot == 90 && y >= 0){
+		//up
+		if (stage[x / SIZE][y / SIZE] != 0){
+			stage[x / SIZE][y / SIZE - 1] = puyo[count][0];
+			stage[x / SIZE][y / SIZE - 2] = puyo[count][1];
+		}
+		else {
+			stage[x / SIZE][y / SIZE] = puyo[count][0];
+			stage[x / SIZE][y / SIZE - 1] = puyo[count][1];
+		}
+		state = State::EVENT;
+		fall_flag = 0;
+	}
+	else if ((y >= 11 * SIZE || stage[x / SIZE][y / SIZE + 1] != 0 || stage[x / SIZE - 1][y / SIZE + 1] != 0) && rot == 180 && y >= 0){
+		//left
+		stage[x / SIZE][y / SIZE] = puyo[count][0];
+		if (stage[x / SIZE - 1][y / SIZE] == 0)
+			stage[x / SIZE - 1][y / SIZE] = puyo[count][1];
+		else
+			stage[x / SIZE - 1][y / SIZE - 1] = puyo[count][1];
+		state = State::EVENT;
+		fall_flag = 0;
+	}
+	else if ((y >= 11 * SIZE || stage[x / SIZE][y / SIZE + 1] != 0 || stage[x / SIZE + 1][y / SIZE + 1] != 0) && rot == 0 && y >= 0){
+		//right
+		stage[x / SIZE][y / SIZE] = puyo[count][0];
+		if (stage[x / SIZE + 1][y / SIZE] == 0)
+			stage[x / SIZE + 1][y / SIZE] = puyo[count][1];
+		else
+			stage[x / SIZE + 1][y / SIZE - 1] = puyo[count][1];
+		state = State::EVENT;
+		fall_flag = 0;
+	}
 	else
 		y++;
 }
 
 int Player::search(int i, int j, int state){
 	int sum = 1;
+	destroy[i][j] = 2;
 
-	if (stage[i][j] == stage[i][j - 1] && j != 0 && state != 2){
+	if (stage[i][j] == stage[i][j - 1] && j != 0 && destroy[i][j - 1] != 2){
 		sum += search(i, j - 1, 1);
 	}
-	if (stage[i][j] == stage[i][j + 1] && j != (HEG - 1) && state != 1){
+	if (stage[i][j] == stage[i][j + 1] && j != (HEG - 1) && destroy[i][j + 1] != 2){
 		sum += search(i, j + 1, 2);
 	}
-	if (stage[i][j] == stage[i - 1][j] && i != 0 && state != 4){
+	if (stage[i][j] == stage[i - 1][j] && i != 0 && destroy[i - 1][j] != 2){
 		sum += search(i - 1, j, 3);
 	}
-	if (stage[i][j] == stage[i + 1][j] && i != (WID - 1) && state != 3){
+	if (stage[i][j] == stage[i + 1][j] && i != (WID - 1) && destroy[i + 1][j] != 2){
 		sum += search(i + 1, j, 4);
 	}
 	return sum;
@@ -160,16 +160,16 @@ int Player::search(int i, int j, int state){
 void Player::sub(int i, int j, int state){
 	destroy[i][j] = 1;
 
-	if (stage[i][j] == stage[i][j - 1] && j != 0 && state != 2){
+	if (stage[i][j] == stage[i][j - 1] && j != 0 && destroy[i][j - 1] != 1){
 		sub(i, j - 1, 1);
 	}
-	if (stage[i][j] == stage[i][j + 1] && j != (HEG - 1) && state != 1){
+	if (stage[i][j] == stage[i][j + 1] && j != (HEG - 1) && destroy[i][j + 1] != 1){
 		sub(i, j + 1, 2);
 	}
-	if (stage[i][j] == stage[i - 1][j] && i != 0 && state != 4){
+	if (stage[i][j] == stage[i - 1][j] && i != 0 && destroy[i - 1][j] != 1){
 		sub(i - 1, j, 3);
 	}
-	if (stage[i][j] == stage[i + 1][j] && i != (WID - 1) && state != 3){
+	if (stage[i][j] == stage[i + 1][j] && i != (WID - 1) && destroy[i + 1][j] != 1){
 		sub(i + 1, j, 4);
 	}
 	//exti disturbance
@@ -193,30 +193,79 @@ void Player::break_puyo(){
 		for (int j = HEG - 1; j >= 0; j--){
 			if (stage[i][j] != 0)
 				val = search(i, j, 0);
+			for (int s = 0; s < WID; s++)
+				for (int k = 0; k < HEG; k++)
+					if (destroy[s][k] != 1)
+						destroy[s][k] = 0;
 			if (val >= 4){
 				if (stage[i][j] != 0)
 					sub(i, j, 0);
 				state = State::DESTROY;
+				time = 0;
+				fall_flag = 0;
 			}
 		}
 	}
 }
 
 int Player::put(){
-		int t;
-	while (1){
+	int t;
+	/*while (fall_flag == 0){
 		t = 0;
-		for (int j = 10; j > 0; j--){
-			for (int i = 0; i < 6; i++){
+		for (int i = 0; i < 6; i++){
+		int k = 0;
+		for (int j = 10; j >= 0; j--){
+		if (stage[i][j] != 0 && stage[i][j + 1] == 0){
+		//stage[i][j + 1] = stage[i][j];
+		t++;
+		falling[i][k] = stage[i][j];
+		k++;
+		stage[i][j] = 0;
+		}
+		}
+		}
+		if (t == 0){
+		fall_flag = 1;
+		break;
+		}
+		}*/
+	if (fall_flag == 0){
+		for (int i = 0; i < 6; i++){
+			int k = 0;
+			for (int j = 10; j >= 0; j--){
 				if (stage[i][j] != 0 && stage[i][j + 1] == 0){
-					stage[i][j + 1] = stage[i][j];
-					stage[i][j] = 0;
-					t++;
+					falling[i][13] = j;
+					while (stage[i][j - k] != 0){
+						falling[i][k] = stage[i][j - k];
+						stage[i][j - k] = 0;
+						k++;
+					}
+					break;
 				}
 			}
+			falling[i][12] = k;
+			if (k != 0){
+				fall_flag = 1;
+				time = 0;
+			}
 		}
-		if (t == 0)
-			break;
+	}
+	if (fall_flag == 1){
+		time += 15;
+		for (int i = 0; i < 6; i++){
+			int val = (falling[i][13] * SIZE + time) / SIZE;
+			if ((stage[i][val + 1] != 0 || val >= 11) && falling[i][13] != 100){
+				for (int j = 0; j < falling[i][12]; j++){
+					stage[i][val - j] = falling[i][j];
+				}
+				falling[i][13] = 100;
+			}
+		}
+		for (int i = 0; i < 6; i++){
+			if (falling[i][13] != 100)
+				return 0;
+		}
+		fall_flag = 0;
 	}
 	break_puyo();
 	return 1;
@@ -226,25 +275,27 @@ void Player::puyo_event(){
 	switch (state){
 	case State::EVENT:
 		if (put() == 1){
-			put_flag = 0;
+			ay = 0;
 			count++;
-			y = 0;
+			y = -50;
 			x = 2 * SIZE;
 			rot = 270;
 			state = State::GAME;
 		}
 		break;
 	case State::DESTROY:
-		time = 254;
-		time %= 255;
-		state = State::GAME;
-		for (int i = 0; i < WID; i++){
-			for (int j = 0; j < HEG; j++){
-				if (destroy[i][j] == 1)
-					stage[i][j] = 0;
+		time++;
+		if (time > 30){
+			for (int i = 0; i < WID; i++){
+				for (int j = 0; j < HEG; j++){
+					if (destroy[i][j] == 1)
+						stage[i][j] = 0;
+				}
 			}
+			time = 0;
+			state = State::EVENT;
+			fall_flag = 0;
 		}
-		state = State::EVENT;
 		break;
 	};
 }
@@ -270,7 +321,7 @@ void Player::draw(){
 				switch (stage[i][j]){
 				case 1:
 					if (destroy[i][j] == 1){
-						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE, Alpha(time));
+						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE, Alpha((time%5) * 50));
 					}
 					else{
 						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE);
@@ -278,7 +329,7 @@ void Player::draw(){
 					break;
 				case 2:
 					if (destroy[i][j] == 1){
-						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE, Alpha(time));
+						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE, Alpha((time%5) * 50));
 					}
 					else{
 						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE);
@@ -286,7 +337,7 @@ void Player::draw(){
 					break;
 				case 3:
 					if (destroy[i][j] == 1){
-						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE, Alpha(time));
+						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE, Alpha((time%5) * 50));
 					}
 					else{
 						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE);
@@ -294,7 +345,7 @@ void Player::draw(){
 					break;
 				case 4:
 					if (destroy[i][j] == 1){
-						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE, Alpha(time));
+						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE, Alpha((time%5) * 50));
 					}
 					else{
 						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE);
@@ -302,7 +353,7 @@ void Player::draw(){
 					break;
 				case 5:
 					if (destroy[i][j] == 1){
-						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE, Alpha(time));
+						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE, Alpha((time%5) * 50));
 					}
 					else{
 						TextureAsset(L"puyo")((stage[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + j * SIZE);
@@ -313,10 +364,6 @@ void Player::draw(){
 		}
 		//puyo is falling
 		for (int i = 0; i < 2; i++){
-			if (put_flag == 2 && i == 1)
-				break;;
-			if (put_flag == 3)
-				i++;
 			int xx = X + x + (int)(i * (cos((double)rot / 360 * 2 * PI)) * SIZE);
 			int yy = Y + y + (int)(i * (-sin((double)rot / 360 * 2 * PI)) * SIZE);
 			switch (puyo[count][i]){
@@ -337,23 +384,46 @@ void Player::draw(){
 				break;
 			}
 		}
+		//fall_flag == 1
+		if (fall_flag == 1)
+		for (int i = 0; i < WID; i++){
+			for (int j = 0; (j + falling[i][13]) < HEG ; j++){
+				switch (falling[i][j]){
+				case 1:
+					TextureAsset(L"puyo")((falling[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + (falling[i][13] - j) * SIZE + time);
+					break;
+				case 2:
+					TextureAsset(L"puyo")((falling[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + (falling[i][13] - j) * SIZE + time);
+					break;
+				case 3:
+					TextureAsset(L"puyo")((falling[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + (falling[i][13] - j) * SIZE + time);
+					break;
+				case 4:
+					TextureAsset(L"puyo")((falling[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + (falling[i][13] - j) * SIZE + time);
+					break;
+				case 5:
+					TextureAsset(L"puyo")((falling[i][j] - 1) * 24, 0, 24, 24).scale(1.5).draw(X + i * SIZE, Y + (falling[i][13] - j) * SIZE + time);
+					break;
+				}
+			}
+		}
 		//display next puyo and two later puyo
 		for (int i = 0; i < 2; i++){
 			switch (puyo[count + 1][i]){
 			case 1:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38 , 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38, 70 + i * SIZE + 10);
 				break;
 			case 2:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38 , 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38, 70 + i * SIZE + 10);
 				break;
 			case 3:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38 , 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38, 70 + i * SIZE + 10);
 				break;
 			case 4:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38 , 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38, 70 + i * SIZE + 10);
 				break;
 			case 5:
-				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38 , 70 + i * SIZE + 10);
+				TextureAsset(L"puyo")((puyo[count + 1][i] - 1) * 24, 0, 24, 24).scale(1.5).draw(WID * SIZE + 38, 70 + i * SIZE + 10);
 				break;
 			}
 			switch (puyo[count + 2][i]){

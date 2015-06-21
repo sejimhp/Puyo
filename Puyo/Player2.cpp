@@ -110,10 +110,6 @@ void Player2::draw(){
 		}
 		//puyo is falling
 		for (int i = 0; i < 2; i++){
-			if (put_flag == 2 && i == 1)
-				break;;
-			if (put_flag == 3)
-				i++;
 			int xx = X + x + (int)(i * (cos((double)rot / 360 * 2 * PI)) * SIZE);
 			int yy = Y + y + (int)(i * (-sin((double)rot / 360 * 2 * PI)) * SIZE);
 			switch (puyo[count][i]){

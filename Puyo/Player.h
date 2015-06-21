@@ -14,7 +14,8 @@ protected:
 	//array
 	int X, Y;
 	//falling
-	int x, y;
+	int x, y, ay;
+	int falling[6][14];
 	//stage data
 	int stage[6][12];
 	//break
@@ -25,7 +26,7 @@ protected:
 	//Rotaition
 	int rot, rot_flag;
 	//put
-	int put_flag;
+	int fall_flag;
 	int ready;
 public:
 	void init(int, int);
