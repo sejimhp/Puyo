@@ -37,6 +37,8 @@ Game::Game(){
 }
 
 void Game::run(){
+	int val1;
+	int val2;
 	switch (state){
 	case State::TITLE:
 		if (Input::KeyEnter.clicked && select == 0)
@@ -65,7 +67,14 @@ void Game::run(){
 			state = State::PAUSE;
 			timer.pause();
 		}
-		if (player1.run() == 1 || player2.run() == 1){
+		val1 = player1.run();
+		val2 = player2.run();
+		if (val1 > 0 && val1 < 100)
+			player2.obs(val1);
+		if (val2 > 0 && val1 < 100)
+			player1.obs(val2);
+
+		if (val1 == 10 || val2 == 100){
 			state = State::END;
 			timer.pause();
 		}

@@ -17,9 +17,9 @@ protected:
 	int x, y, ay;
 	int falling[6][14];
 	//stage data
-	int stage[6][12];
+	int stage[6][14];
 	//break
-	int destroy[6][12], time;
+	int destroy[6][13], time;
 	//puyopuyo
 	int count;
 	int puyo[100][2];
@@ -28,6 +28,8 @@ protected:
 	//put
 	int fall_flag;
 	int ready;
+
+	int obstacle, obs_flag, attack;
 public:
 	void init(int, int);
 
@@ -43,6 +45,7 @@ public:
 	int start();
 	void ending();
 
+	void obs(int);
 	void set(int data[][2]);
 	void draw();
 };
